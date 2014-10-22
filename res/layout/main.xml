@@ -1,0 +1,59 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+   android:background="@drawable/irongrip_repeating" >
+
+    <ScrollView
+        android:id="@+id/sv1"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/txtChat"
+        android:scrollbarFadeDuration="0" 
+        android:fillViewport="true"
+        android:transcriptMode="alwaysScroll">
+        
+		<RelativeLayout
+            android:id="@+id/conversationLayout"
+            android:layout_width="fill_parent" 
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_gravity="fill" >
+
+        </RelativeLayout>
+    </ScrollView>
+
+    <EditText
+        android:id="@+id/txtChat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/btnSend"
+        android:layout_toRightOf="@+id/btnAudio"
+        android:ems="10"
+        android:gravity="left"
+        android:paddingTop="5dip"
+        android:scrollbars="vertical"
+        android:textSize="20sp" />
+
+    <ImageButton
+        android:id="@+id/btnSend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/txtChat"
+        android:src="@android:drawable/btn_star"
+        android:paddingTop="5dip" />
+
+    <ImageButton
+        android:id="@+id/btnAudio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignTop="@+id/txtChat"
+        android:paddingTop="5dip"
+        android:src="@drawable/mic" />
+
+</RelativeLayout>

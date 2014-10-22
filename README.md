@@ -1,0 +1,1 @@
+Server is jWebSocket. Client is Android/Eclipse with a web page to simulate real time chat

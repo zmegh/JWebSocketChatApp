@@ -1,0 +1,286 @@
+<html>
+    <head>
+        <link href="style.css" rel="stylesheet" type="text/css" />
+    
+        <style>
+            body {
+                font-family: "Helvetica Neue", helvetica, arial;
+                padding: 15px;
+            }
+
+            ul {
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                height: 45px;
+            }
+
+            ul li {
+                line-height: 1.4;
+            }
+            #userInput
+            {
+                width: 226px;
+                height: 30px;
+            }
+            #btnSubmit
+            {
+                width: 44px;
+            }
+            
+        </style>
+  <script src="src/lib/jquery/jquery-1.7.js" type="text/javascript"></script>
+     <script src="src/lib/zepto.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="src/jqt.js" type="text/javascript" charset="utf-8"></script>
+<script src="src/jqtouch-jquery.js" type="text/javascript" charset="utf-8"></script>
+        <script type="text/javascript" src="jWebSocket.js"></script >
+		
+      
+       <script type="text/javascript" charset="utf-8">
+function scrollDown(div)
+{
+	  div.animate({ scrollTop: 10000 }, "slow");
+}
+        /*    var jQT = new $.jQTouch({
+                icon: 'jqtouch.png',
+                icon4: 'jqtouch4.png',
+                addGlossToIcon: false,
+                startupScreen: 'jqt_startup.png',
+                statusBar: 'black-translucent',
+                themeSelectionSelector: '#jqt #themes ul',
+                preloadImages: []
+            });
+            */
+            function getDate() {
+                var a_p = "";
+                var d = new Date();
+                var curr_hour = d.getHours();
+                if (curr_hour < 12) {
+                    a_p = "AM";
+                }
+                else {
+                    a_p = "PM";
+                }
+                if (curr_hour == 0) {
+                    curr_hour = 12;
+                }
+                if (curr_hour > 12) {
+                    curr_hour = curr_hour - 12;
+                }
+
+                var curr_min = d.getMinutes();
+
+                curr_min = curr_min + "";
+
+                if (curr_min.length == 1) {
+                    curr_min = "0" + curr_min;
+                }
+
+                var m_names = new Array("Jan", "Feb", "Mar",
+                    "Apr", "May", "Jun", "Jul", "Aug", "Sep",
+                    "Oct", "Nov", "Dec");
+
+                var curr_date = d.getDate();
+                var curr_month = d.getMonth();
+                var curr_year = d.getFullYear();
+
+                return m_names[curr_month] + " " + curr_date + ", " + curr_year + ' ' + curr_hour + ":" + curr_min + " " + a_p;
+            }
+            //jws.browserSupportsWebSockets checks if web sockets are available
+            //either natively, by the FlashBridge or by the ChromeFrame.
+ 
+            /*if (jws.browserSupportsWebSockets()) {
+     jWebSocketClient = new jws.jWebSocketJSONClient();
+
+     // Optionally enable GUI controls here
+ } else {
+     // Optionally disable GUI controls here
+     var lMsg = jws.MSG_WS_NOT_SUPPORTED;
+     alert(lMsg);
+ }*/
+ 
+            jWebSocketClient = new jws.jWebSocketJSONClient();
+
+// var lURL = jws.getDefaultSSLServerURL() + "/;timeout=360000";
+            var lURL = "ws://54.187.73.9:8787/jWebSocket/jWebSocket";
+
+            jWebSocketClient.logon(lURL, "guest", "guest", {
+
+                OnOpen: function (aEvent) {
+                    alert('connected');
+                    log("Connected to ws://54.187.73.9:8787/jWebSocket/jWebSocket/;timeout=360000");
+                },
+                OnMessage: function (aEvent, aToken) {
+                    
+                    if (!aEvent || !aToken) return false;
+                        
+                    // alert('in onMessage data ' + aEvent.data);
+                    if (aToken.type == "broadcast")
+                        receiveMsg(aToken.type, aEvent);
+                }   
+   
+            });
+
+
+            function broadcast(msg) {
+
+                var lMsg = msg;
+                var lTarget = "*";
+                if (lMsg.length > 0) {
+                    //log( USR, OUT, lMsg );
+                    var lRes;
+                    if (!lTarget || lTarget == "*") {
+                       
+                        lRes = jWebSocketClient.broadcastText(
+                            "", // broadcast to all clients (not limited to a certain pool)
+                            lMsg // broadcast this message
+                        );
+                    } else {
+                        lRes = jWebSocketClient.sendText(
+                            lTarget, // broadcast to all clients (not limited to a certain pool)
+                            lMsg // broadcast this message
+                        );
+                    }
+                    // log error only, on success don't confuse the user
+                    if (lRes.code !== 0) {
+                        alert(lRes.msg);
+                        //log( SYS, OUT, "broadcast: " + lRes.msg );
+                    }
+                    // eMessage.value = "";
+                }
+                //doFocus( eMessage );
+            }
+ 
+            $(document).ready(function () {
+                $("#btnSubmit").click(function () {
+                    sendMsg();
+                });
+
+                $("#userInput").keypress(function (e) {
+                    if (e.which == 13) {
+                        sendMsg();
+                        return false;    //<---- Add this line
+                    }
+                });
+	 
+            });
+   
+            function log(msg)
+            {
+                $("#logMsg").append("<li>" + msg + "</li>");
+            }
+
+            function sendMsg() {
+                broadcast($("#userInput").val());
+       
+                var conversation = $('#conversation');
+                var button = $('#btnSubmit');
+
+                var newTime = $('<div class="time"><p>' + getDate() + '</p></div>');
+               
+
+                var newText = $('<div class="text sent"><div class="reflect"></div><p>' + $("#userInput").val() + '</p></div>');
+                newText.hide();
+                conversation.append(newText);
+
+                newTime.hide();
+                conversation.append(newTime);
+                
+                newText.show('normal');
+                newTime.show('fast');
+                scrollDown(conversation);
+               // disable(button);
+                $("#userInput").val('');
+            }
+
+            function receiveMsg(type, msg) {
+
+                var obj = jQuery.parseJSON(msg.data);
+               
+                var conversation = $('#conversation');
+                var newTime = $('<div class="time"><p>' + getDate() + '</p></div>');
+               
+                
+                var newText = $('<div class="text receive"><div class="reflect"></div><p><b>'+ obj.sourceId + ': </b> ' + obj.data + '</p></div>');
+                newText.hide();
+                conversation.append(newText);
+                newTime.hide();
+                conversation.append(newTime);
+                
+                newText.show('normal');
+                newTime.show('fast');
+            }
+        </script>
+        <!--
+            // var host = location.origin.replace(/^http/, 'ws');
+
+            var socket = io.connect("ws://localhost:8787/jWebSocket/jWebSocket");
+            socket.on('echoback', function (data) {
+            // console.log(data);
+            // alert(data);
+            //socket.emit('my other event', { my: 'data' });
+            $("#pings").append("<li>" + data + "</li>");    
+		
+            });
+		
+            socket.on('newuser', function (data) {
+            //alert('new user');
+            //  socket.emit('my other event', { my: 'data' });
+            });
+
+            $(document).ready(function () {
+         
+            $("#btnSubmit").keypress(function (e) {
+            if (e.which == 13) {
+            sendMsg();
+            return false;    //<---- Add this line
+            }
+            });
+         
+            $("#btnSubmit").click(function () {
+            sendMsg()
+            });
+				
+            });
+		
+		
+            function sendMsg()
+            {
+            socket.emit("msg", $("#chatBox").val());
+			
+            }
+		
+        </script>
+            -->
+    </head>
+  <body>
+
+<table style="width: 20%; height: 245px">
+	    <tr id="textInputRow">
+	        <td valign="top">
+	            <input type="text" id="userInput"/>
+
+	            <input type="submit" id="btnSubmit"/>
+	        </td>   
+	    </tr>
+    <tr id="chatViewRow">
+        <td>
+            <div id="conversation" class="conversation">
+            </div>
+        </td>
+    </tr>
+        
+
+
+	    <tr id="logRow">
+	        <td valign="top"><b>Log:</b><br/>
+	            <div id="log" style="border:darkgray 1px solid;">
+		            <ul id="logMsg"></ul>
+	                </div> 
+	        </td>
+	    </tr>
+	</table>
+	
+
+  </body>
+</html>
